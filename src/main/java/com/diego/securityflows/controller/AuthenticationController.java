@@ -1,6 +1,7 @@
 package com.diego.securityflows.controller;
 
 import com.diego.securityflows.domain.LoginRequestDTO;
+import com.diego.securityflows.domain.PasswordChangeDTO;
 import com.diego.securityflows.entity.User;
 import com.diego.securityflows.security.jwt.JwtService;
 import com.diego.securityflows.service.AuthenticationService;
@@ -10,10 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
