@@ -5,8 +5,12 @@ import com.diego.securityflows.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -17,7 +21,7 @@ public class UserController {
     private final AuthenticationService authenticationService;
 
     @PutMapping("/password")
-    public ResponseEntity<String> changePassword(@RequestBody PasswordChangeDTO request) {
+    public ResponseEntity<String> changePassword(@RequestBody @Valid PasswordChangeDTO request) {
         authenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok("User password changed successfully");
     }
