@@ -18,12 +18,7 @@ public class UserController {
 
     @PutMapping("/password")
     public ResponseEntity<String> changePassword(@RequestBody PasswordChangeDTO request) {
-        try {
-            authenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
-        } catch (BadCredentialsException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(e.getMessage());
-        }
+        authenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok("User password changed successfully");
     }
 
