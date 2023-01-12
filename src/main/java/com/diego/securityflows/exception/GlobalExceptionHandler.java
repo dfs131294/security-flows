@@ -24,4 +24,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         .timestamp(ZonedDateTime.now())
                         .build());
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(Exception ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(SecurityFlowsExceptionDTO.builder()
+                        .httpStatus(HttpStatus.BAD_REQUEST)
+                        .mensaje(ex.getMessage())
+                        .timestamp(ZonedDateTime.now())
+                        .build());
+    }
 }

@@ -34,14 +34,9 @@ public class AuthenticationController {
 
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody LoginRequestDTO request) {
-        try {
-            authenticationService.createUser(
-                    new User(request.getUsername(), request.getPassword())
-            );
-        } catch (BadCredentialsException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(e.getMessage());
-        }
+        authenticationService.createUser(
+                new User(request.getUsername(), request.getPassword())
+        );
         return ResponseEntity.ok("User created successfully");
     }
 
