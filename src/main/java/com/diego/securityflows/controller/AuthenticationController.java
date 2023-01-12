@@ -21,7 +21,7 @@ import javax.validation.Valid;
 public class AuthenticationController {
 
     private final JwtService jwtService;
-    private final AuthenticationManager basicAuthenticationManager;
+    private final AuthenticationManager jwtAuthenticationManager;
     private final AuthenticationService authenticationService;
 
     @PostMapping("login")
@@ -30,7 +30,7 @@ public class AuthenticationController {
         final String password = request.getPassword();
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-        basicAuthenticationManager.authenticate(token);
+        jwtAuthenticationManager.authenticate(token);
         return ResponseEntity.ok(jwtService.generate(username));
     }
 

@@ -1,8 +1,11 @@
 package com.diego.securityflows.service;
 
+import com.diego.securityflows.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +15,22 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class AuthenticationService extends InMemoryUserDetailsManager {
 
-    private static final Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2(a|y|b)?\\$(\\d\\d)\\$[./0-9A-Za-z]{53}");
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Override
     public void createUser(UserDetails user) {
-//        if (!BCRYPT_PATTERN.matcher(user.getPassword()).matches()) {
-//            throw new BadCredentialsException("Password is not encrypted");
-//        }
+        final String encodedPassword = getEncodedPassword(user.getPassword());
+        ((User) user).setPassword(encodedPassword);
         super.createUser(user);
+    }
+
+    @Override
+    public void changePassword(String oldPassword, String newPassword) {
+        final String encodedPassword = getEncodedPassword(newPassword);
+        super.changePassword(oldPassword, encodedPassword);
+    }
+
+    private String getEncodedPassword(String password) {
+        return bCryptPasswordEncoder.encode(password);
     }
 }

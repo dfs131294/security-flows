@@ -5,6 +5,7 @@ import com.diego.securityflows.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,11 +20,12 @@ import javax.validation.Valid;
 public class UserController {
 
     private final AuthenticationService authenticationService;
+    private final AuthenticationManager jwtAuthenticationManager;
 
     @PutMapping("/password")
     public ResponseEntity<String> changePassword(@RequestBody @Valid PasswordChangeDTO request) {
+        authenticationService.setAuthenticationManager(jwtAuthenticationManager);
         authenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok("User password changed successfully");
     }
-
 }

@@ -15,5 +15,4 @@ public class HomeController {
     public String basicAuthHello() {
         return "Hello... Basic Authentication!!";
     }
-
 }
