@@ -26,14 +26,27 @@ public class InMemoryUserService implements UserService {
     }
 
     private Set<String> findUsernames() {
+        final Field field = this.getUsersFieldAccesible();
+        return this.getKeySetFromUsersField(field);
+    }
+
+    private Field getUsersFieldAccesible() {
         try {
             Field field = userAuthenticationService.getClass()
                     .getSuperclass()
                     .getDeclaredField("users");
             field.setAccessible(true);
-            final Map<String, Object> mutableUsers = (Map<String, Object>)field.get(userAuthenticationService);
-            return mutableUsers.keySet();
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+            return field;
+        } catch (NoSuchFieldException e) {
+            throw new SecurityFlowException("Internal Error");
+        }
+    }
+
+    private Set<String> getKeySetFromUsersField(Field field) {
+        try {
+            return ((Map<String, Object>)field.get(userAuthenticationService))
+                    .keySet();
+        } catch (IllegalAccessException e) {
             throw new SecurityFlowException("Internal Error");
         }
     }
