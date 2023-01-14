@@ -37,7 +37,7 @@ public class JwtService {
     }
 
     public boolean isExpired(String token) {
-        Claims claims = getClaims(token);
+        final Claims claims = getClaims(token);
         return claims.getExpiration()
                 .before(new Date(System.currentTimeMillis()));
     }

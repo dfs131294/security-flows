@@ -1,15 +1,13 @@
 package com.diego.securityflows.controller;
 
-import com.diego.securityflows.domain.PasswordChangeDTO;
+import com.diego.securityflows.dto.DeleteUserRequestDTO;
+import com.diego.securityflows.dto.PasswordChangeRequestDTO;
 import com.diego.securityflows.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -23,9 +21,15 @@ public class UserController {
     private final AuthenticationManager jwtAuthenticationManager;
 
     @PutMapping("/password")
-    public ResponseEntity<String> changePassword(@RequestBody @Valid PasswordChangeDTO request) {
+    public ResponseEntity<String> changePassword(@RequestBody @Valid PasswordChangeRequestDTO request) {
         authenticationService.setAuthenticationManager(jwtAuthenticationManager);
         authenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok("User password changed successfully");
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> delete(@RequestBody @Valid DeleteUserRequestDTO request) {
+        authenticationService.deleteUser(request.getUsername());
+        return ResponseEntity.ok("User deleted successfully");
     }
 }

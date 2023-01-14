@@ -1,4 +1,4 @@
-package com.diego.securityflows.domain;
+package com.diego.securityflows.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package com.diego.securityflows.controller;
 
-import com.diego.securityflows.domain.LoginRequestDTO;
+import com.diego.securityflows.dto.LoginRequestDTO;
 import com.diego.securityflows.entity.User;
 import com.diego.securityflows.security.jwt.JwtService;
 import com.diego.securityflows.service.AuthenticationService;

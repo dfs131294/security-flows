@@ -26,6 +26,12 @@ public class AuthenticationService extends InMemoryUserDetailsManager {
         super.changePassword(oldPassword, encodedPassword);
     }
 
+    @Override
+    public void deleteUser(String username) {
+        final UserDetails user = this.loadUserByUsername(username);
+        super.deleteUser(user.getUsername());
+    }
+
     private String getEncodedPassword(String password) {
         return bCryptPasswordEncoder.encode(password);
     }
