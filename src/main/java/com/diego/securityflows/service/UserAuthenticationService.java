@@ -36,7 +36,8 @@ public class UserAuthenticationService extends InMemoryUserDetailsManager {
 
     public void updatePassword(String username, String newPassword) {
         UserDetails user = this.loadUserByUsername(username);
-        this.updatePassword(user, newPassword);
+        final String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
+        this.updatePassword(user, encodedPassword);
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Locale;
 
 @Service
 public class JwtService {
@@ -32,7 +33,7 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String userName = getUsername(token);
+        final String userName = getUsername(token).toLowerCase();
         return userName.equals(userDetails.getUsername()) && !isExpired(token);
     }
 

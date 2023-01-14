@@ -20,6 +20,6 @@ public class CreateUserRequestDTO {
     private String password;
 
     @NotEmpty(message = "Role should not be empty")
-    @ValueOfEnum(enumClass = Role.class)
+    @ValueOfEnum(enumClass = Role.class, message = "Role should be USER or ADMIN")
     private String role;
 }

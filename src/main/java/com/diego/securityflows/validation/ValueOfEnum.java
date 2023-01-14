@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = ValueOfEnumValidator.class)
 public @interface ValueOfEnum {
     Class<? extends Enum<?>> enumClass();
-    String message() default "Role should be USER or ADMIN";
+    String message() default "Invalid value";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
