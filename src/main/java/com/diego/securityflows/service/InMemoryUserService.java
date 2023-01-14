@@ -33,7 +33,7 @@ public class InMemoryUserService implements UserService {
             field.setAccessible(true);
             final Map<String, Object> mutableUsers = (Map<String, Object>)field.get(userAuthenticationService);
             return mutableUsers.keySet();
-        } catch (Exception e) {
+        } catch (NoSuchFieldException e) {
             throw new SecurityFlowException("Internal Error");
         }
     }
