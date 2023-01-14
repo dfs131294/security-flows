@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 @Builder
-public class PasswordChangeRequestDTO {
+public class ChangePasswordRequestDTO {
 
     @NotEmpty(message = "Old password should not be empty")
     private String oldPassword;

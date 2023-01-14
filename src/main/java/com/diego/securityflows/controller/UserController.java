@@ -1,12 +1,11 @@
 package com.diego.securityflows.controller;
 
 import com.diego.securityflows.dto.DeleteUserRequestDTO;
-import com.diego.securityflows.dto.PasswordChangeRequestDTO;
+import com.diego.securityflows.dto.ChangePasswordRequestDTO;
 import com.diego.securityflows.dto.UpdatePasswordRequestDTO;
 import com.diego.securityflows.service.UserAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.sql.Update;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +20,7 @@ public class UserController {
     private final UserAuthenticationService userAuthenticationService;
 
     @PutMapping("/password")
-    public ResponseEntity<String> changePassword(@RequestBody @Valid PasswordChangeRequestDTO request) {
+    public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequestDTO request) {
         userAuthenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok("User password changed successfully");
     }
