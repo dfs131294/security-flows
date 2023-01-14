@@ -46,7 +46,7 @@ public class JwtSecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .antMatchers("/auth/**", "/h2/**").permitAll()
-                .antMatchers("/external/**").permitAll()
+                .antMatchers("/public/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

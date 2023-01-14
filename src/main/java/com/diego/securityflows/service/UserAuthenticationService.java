@@ -35,7 +35,7 @@ public class UserAuthenticationService extends InMemoryUserDetailsManager {
     }
 
     public void updatePassword(String username, String newPassword) {
-        final UserDetails user = this.loadUserByUsername(username);
+        UserDetails user = this.loadUserByUsername(username);
         this.updatePassword(user, newPassword);
     }
 
@@ -46,7 +46,7 @@ public class UserAuthenticationService extends InMemoryUserDetailsManager {
     }
 
     private String getPasswordFromCurrentAuthenticatedUser() {
-        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        final Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         if (Objects.isNull(currentUser)) {
             throw new AccessDeniedException("Unauthorized");
         }

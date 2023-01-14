@@ -28,17 +28,18 @@ public class AuthenticationController {
     public ResponseEntity<String> login(@RequestBody @Valid LoginRequestDTO request) {
         final String username = request.getUsername();
         final String password = request.getPassword();
-
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+        final UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
         jwtAuthenticationManager.authenticate(token);
         return ResponseEntity.ok(jwtService.generate(username));
     }
 
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody @Valid LoginRequestDTO request) {
-        userAuthenticationService.createUser(
-                new User(request.getUsername(), request.getPassword())
-        );
+        User user = User.builder()
+                .email(request.getUsername())
+                .password(request.getPassword())
+                .build();
+        userAuthenticationService.createUser(user);
         return ResponseEntity.ok("User created successfully");
     }
 }

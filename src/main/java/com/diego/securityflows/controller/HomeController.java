@@ -13,7 +13,7 @@ public class HomeController {
         return "Hello...!!";
     }
 
-    @GetMapping("external/hello")
+    @GetMapping("public/hello")
     public String basicAuthHello() {
         return "Hello... Basic Authentication!!";
     }
