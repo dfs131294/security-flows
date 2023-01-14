@@ -1,6 +1,6 @@
 package com.diego.securityflows.security.jwt;
 
-import com.diego.securityflows.service.AuthenticationService;
+import com.diego.securityflows.service.UserAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_TOKEN_STARTER = "Bearer ";
     private final JwtService jwtService;
-    private final AuthenticationService authenticationService;
+    private final UserAuthenticationService userAuthenticationService;
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Override
@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            userDetails = authenticationService.loadUserByUsername(userEmail);
+            userDetails = userAuthenticationService.loadUserByUsername(userEmail);
 
             if (Objects.isNull(userDetails) || !jwtService.isTokenValid(jwt, userDetails)) {
                 filterChain.doFilter(request, response);

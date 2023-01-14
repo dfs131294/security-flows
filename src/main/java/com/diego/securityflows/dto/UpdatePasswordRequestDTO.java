@@ -8,9 +8,12 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 @NoArgsConstructor
-public class DeleteUserRequestDTO {
+public class UpdatePasswordRequestDTO {
 
     @NotEmpty(message = "Email should not be empty")
     @Email(message = "Email must have a valid format")
     private String username;
+
+    @NotEmpty(message = "New password should not be empty")
+    private String newPassword;
 }

@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.FieldError;
@@ -18,7 +20,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -28,6 +29,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final String INVALID_JWT_TOKEN_MESSAGE = "Invalid JWT Token";
     private static final String INVALID_PAYLOAD_MESSAGE = "Invalid Payload";
     private static final String USER_NOT_FOUND_MESSAGE = "User with username '%s' not found";
+    private static final String ACCESS_DENIED_MESSAGE = "Unauthorized";
 
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<Object> handleJwtException(Exception ex, WebRequest request) {
@@ -39,7 +41,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         .build());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler({ IllegalArgumentException.class, SecurityFlowException.class })
     public ResponseEntity<Object> handleIllegalArgumentException(Exception ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(SecurityFlowsExceptionDTO.builder()
@@ -55,6 +57,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(SecurityFlowsExceptionDTO.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST)
                         .message(String.format(USER_NOT_FOUND_MESSAGE, ex.getMessage()))
+                        .build());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(SecurityFlowsExceptionDTO.builder()
+                        .httpStatus(HttpStatus.BAD_REQUEST)
+                        .message(ACCESS_DENIED_MESSAGE)
+                        .timestamp(ZonedDateTime.now())
+                        .build());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadCredentialsException(Exception ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(SecurityFlowsExceptionDTO.builder()
+                        .httpStatus(HttpStatus.UNAUTHORIZED)
+                        .message(ex.getMessage())
                         .timestamp(ZonedDateTime.now())
                         .build());
     }

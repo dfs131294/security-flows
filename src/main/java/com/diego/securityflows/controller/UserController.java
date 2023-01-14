@@ -2,11 +2,12 @@ package com.diego.securityflows.controller;
 
 import com.diego.securityflows.dto.DeleteUserRequestDTO;
 import com.diego.securityflows.dto.PasswordChangeRequestDTO;
-import com.diego.securityflows.service.AuthenticationService;
+import com.diego.securityflows.dto.UpdatePasswordRequestDTO;
+import com.diego.securityflows.service.UserAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.sql.Update;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -17,19 +18,23 @@ import javax.validation.Valid;
 @Slf4j
 public class UserController {
 
-    private final AuthenticationService authenticationService;
-    private final AuthenticationManager jwtAuthenticationManager;
+    private final UserAuthenticationService userAuthenticationService;
 
     @PutMapping("/password")
     public ResponseEntity<String> changePassword(@RequestBody @Valid PasswordChangeRequestDTO request) {
-        authenticationService.setAuthenticationManager(jwtAuthenticationManager);
-        authenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
+        userAuthenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok("User password changed successfully");
+    }
+
+    @PutMapping("/password/update")
+    public ResponseEntity<String> updatePassword(@RequestBody @Valid UpdatePasswordRequestDTO request) {
+        userAuthenticationService.updatePassword(request.getUsername(), request.getNewPassword());
+        return ResponseEntity.ok("User password updated successfully");
     }
 
     @DeleteMapping
     public ResponseEntity<String> delete(@RequestBody @Valid DeleteUserRequestDTO request) {
-        authenticationService.deleteUser(request.getUsername());
+        userAuthenticationService.deleteUser(request.getUsername());
         return ResponseEntity.ok("User deleted successfully");
     }
 }
