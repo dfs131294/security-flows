@@ -1,5 +1,7 @@
 package com.diego.securityflows.controller;
 
+import com.diego.securityflows.domain.Role;
+import com.diego.securityflows.dto.CreateUserRequestDTO;
 import com.diego.securityflows.dto.LoginRequestDTO;
 import com.diego.securityflows.entity.User;
 import com.diego.securityflows.security.jwt.JwtService;
@@ -34,10 +36,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<String> register(@RequestBody @Valid LoginRequestDTO request) {
+    public ResponseEntity<String> register(@RequestBody @Valid CreateUserRequestDTO request) {
         User user = User.builder()
                 .email(request.getUsername())
                 .password(request.getPassword())
+                .role(Role.valueOf(request.getRole()))
                 .build();
         userAuthenticationService.createUser(user);
         return ResponseEntity.ok("User created successfully");

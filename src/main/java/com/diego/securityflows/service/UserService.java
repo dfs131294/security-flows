@@ -1,9 +1,10 @@
 package com.diego.securityflows.service;
 
-import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.diego.securityflows.entity.User;
 
-@Service
-@NoArgsConstructor
-public class UserService {
+import java.util.List;
+
+public interface UserService {
+
+    List<User> findAll();
 }

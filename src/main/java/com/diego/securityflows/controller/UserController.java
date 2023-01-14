@@ -1,8 +1,10 @@
 package com.diego.securityflows.controller;
 
-import com.diego.securityflows.dto.DeleteUserRequestDTO;
 import com.diego.securityflows.dto.ChangePasswordRequestDTO;
+import com.diego.securityflows.dto.DeleteUserRequestDTO;
 import com.diego.securityflows.dto.UpdatePasswordRequestDTO;
+import com.diego.securityflows.entity.User;
+import com.diego.securityflows.service.InMemoryUserService;
 import com.diego.securityflows.service.UserAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -18,6 +21,12 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserAuthenticationService userAuthenticationService;
+    private final InMemoryUserService inMemoryUserService;
+
+    @GetMapping
+    public ResponseEntity<List<User>> findAll() {
+        return ResponseEntity.ok(inMemoryUserService.findAll());
+    }
 
     @PutMapping("/password")
     public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequestDTO request) {
