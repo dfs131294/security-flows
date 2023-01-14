@@ -2,6 +2,7 @@ package com.diego.securityflows.service;
 
 import com.diego.securityflows.domain.Role;
 import com.diego.securityflows.entity.User;
+import com.diego.securityflows.exception.SecurityFlowException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class InMemoryUserService implements UserService {
             final Map<String, Object> mutableUsers = (Map<String, Object>)field.get(userAuthenticationService);
             return mutableUsers.keySet();
         } catch (Exception e) {
-            return Set.of();
+            throw new SecurityFlowException("Internal Error");
         }
     }
 
