@@ -3,9 +3,9 @@ package com.diego.securityflows.controller;
 import com.diego.securityflows.dto.ChangePasswordRequestDTO;
 import com.diego.securityflows.dto.DeleteUserRequestDTO;
 import com.diego.securityflows.dto.UpdatePasswordRequestDTO;
-import com.diego.securityflows.entity.User;
+import com.diego.securityflows.dto.UserResponseDTO;
 import com.diego.securityflows.service.InMemoryUserService;
-import com.diego.securityflows.service.UserAuthenticationService;
+import com.diego.securityflows.service.InMemoryUserAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,29 +20,29 @@ import java.util.List;
 @Slf4j
 public class UserController {
 
-    private final UserAuthenticationService userAuthenticationService;
+    private final InMemoryUserAuthenticationService inMemoryUserAuthenticationService;
     private final InMemoryUserService inMemoryUserService;
 
     @GetMapping
-    public ResponseEntity<List<User>> findAll() {
+    public ResponseEntity<List<UserResponseDTO>> findAll() {
         return ResponseEntity.ok(inMemoryUserService.findAll());
     }
 
     @PutMapping("/password")
     public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequestDTO request) {
-        userAuthenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
+        inMemoryUserAuthenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok("User password changed successfully");
     }
 
     @PutMapping("/password/update")
     public ResponseEntity<String> updatePassword(@RequestBody @Valid UpdatePasswordRequestDTO request) {
-        userAuthenticationService.updatePassword(request.getUsername(), request.getNewPassword());
+        inMemoryUserAuthenticationService.updatePassword(request.getUsername(), request.getNewPassword());
         return ResponseEntity.ok("User password updated successfully");
     }
 
     @DeleteMapping
     public ResponseEntity<String> delete(@RequestBody @Valid DeleteUserRequestDTO request) {
-        userAuthenticationService.deleteUser(request.getUsername());
+        inMemoryUserAuthenticationService.deleteUser(request.getUsername());
         return ResponseEntity.ok("User deleted successfully");
     }
 }

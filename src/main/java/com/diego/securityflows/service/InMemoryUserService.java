@@ -1,65 +1,27 @@
 package com.diego.securityflows.service;
 
-import com.diego.securityflows.domain.Role;
-import com.diego.securityflows.entity.User;
-import com.diego.securityflows.exception.SecurityFlowException;
+import com.diego.securityflows.dto.UserResponseDTO;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class InMemoryUserService implements UserService {
 
-    private final UserAuthenticationService userAuthenticationService;
+    private final InMemoryUserAuthenticationService inMemoryUserAuthenticationService;
 
     @Override
-    public List<User> findAll() {
-        Set<String> usernames = this.findUsernames();
-        return this.findUsers(usernames);
-    }
-
-    private Set<String> findUsernames() {
-        final Field field = this.getUsersFieldAccesible();
-        return this.getKeySetFromUsersField(field);
-    }
-
-    private Field getUsersFieldAccesible() {
-        try {
-            Field field = userAuthenticationService.getClass()
-                    .getSuperclass()
-                    .getDeclaredField("users");
-            field.setAccessible(true);
-            return field;
-        } catch (NoSuchFieldException e) {
-            throw new SecurityFlowException("Internal Error");
-        }
-    }
-
-    private Set<String> getKeySetFromUsersField(Field field) {
-        try {
-            return ((Map<String, Object>)field.get(userAuthenticationService))
-                    .keySet();
-        } catch (IllegalAccessException e) {
-            throw new SecurityFlowException("Internal Error");
-        }
-    }
-
-    private List<User> findUsers(Set<String> usernames) {
-        return usernames.stream()
-                .map(userAuthenticationService::loadUserByUsername)
-                .map(u -> User.builder()
-                        .email(u.getUsername())
-                        .role(Role.valueOf(u.getAuthorities()
-                                .stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .collect(Collectors.toList()).get(0)))
+    public List<UserResponseDTO> findAll() {
+        return inMemoryUserAuthenticationService.getUsers()
+                .stream()
+                .map(u -> UserResponseDTO.builder()
+                        .firstName(u.getFirstname())
+                        .lastName(u.getLastname())
+                        .username(u.getUsername())
+                        .role(u.getRole())
                         .build())
                 .collect(Collectors.toList());
     }

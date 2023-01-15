@@ -1,10 +1,10 @@
 package com.diego.securityflows.service;
 
-import com.diego.securityflows.entity.User;
+import com.diego.securityflows.dto.UserResponseDTO;
 
 import java.util.List;
 
 public interface UserService {
 
-    List<User> findAll();
+    List<UserResponseDTO> findAll();
 }

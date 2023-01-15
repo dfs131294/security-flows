@@ -16,6 +16,12 @@ public class CreateUserRequestDTO {
     @Email(message = "Email must have a valid format")
     private String username;
 
+    @NotEmpty(message = "Firstname should not be empty")
+    private String firstname;
+
+    @NotEmpty(message = "Lastname should not be empty")
+    private String lastname;
+
     @NotEmpty(message = "Password should not be empty")
     private String password;
 

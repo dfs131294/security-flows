@@ -1,6 +1,6 @@
 package com.diego.securityflows.security.basic;
 
-import com.diego.securityflows.service.UserAuthenticationService;
+import com.diego.securityflows.service.InMemoryUserAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,14 +20,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class BasicSecurityConfig {
 
-    private final UserAuthenticationService userAuthenticationService;
+    private final InMemoryUserAuthenticationService inMemoryUserAuthenticationService;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Bean
     public AuthenticationProvider basicAuthenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setPasswordEncoder(passwordEncoder);
-        authenticationProvider.setUserDetailsService(userAuthenticationService);
+        authenticationProvider.setUserDetailsService(inMemoryUserAuthenticationService);
         return authenticationProvider;
     }
 
