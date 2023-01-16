@@ -68,7 +68,7 @@ public class InMemoryUserAuthenticationService extends InMemoryUserDetailsManage
         }
     }
 
-    @SuppressWarnings({ "unchecked", "ConstantConditions"})
+    @SuppressWarnings({ "unchecked", "ConstantConditions" })
     private Map<String, Object> getInMemoryUsers() {
         Field field = ReflectionUtils.findField(this.getClass().getSuperclass(), "users");
         ReflectionUtils.makeAccessible(field);

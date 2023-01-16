@@ -53,7 +53,7 @@ public class InMemoryUserService implements UserService {
     public void update(String username, UserDTO userDTO) {
         final User currentUser = this.find(username);
         final User user = this.buildUserToUpdate(currentUser, userDTO);
-        // This is because Spring security in memory service does not allow for username update
+        // This is because Spring security in memory service does not allow for username updates
         if (currentUser.getUsername().equals(user.getUsername())) {
             inMemoryUserAuthenticationService.updateUser(user);
             return;
