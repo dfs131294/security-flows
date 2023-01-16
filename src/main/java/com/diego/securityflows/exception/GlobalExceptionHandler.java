@@ -57,6 +57,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(SecurityFlowsExceptionDTO.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST)
                         .message(String.format(USER_NOT_FOUND_MESSAGE, ex.getMessage()))
+                        .timestamp(ZonedDateTime.now())
                         .build());
     }
 
