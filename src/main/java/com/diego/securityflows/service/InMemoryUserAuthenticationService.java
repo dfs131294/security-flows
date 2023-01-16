@@ -34,7 +34,6 @@ public class InMemoryUserAuthenticationService extends InMemoryUserDetailsManage
                 .collect(Collectors.toList());
     }
 
-    @Override
     public void changePassword(String oldPassword, String newPassword) {
         final String currentAuthenticatedUserPassword = this.getPasswordFromCurrentAuthenticatedUser();
         this.validateOldPassword(oldPassword, currentAuthenticatedUserPassword);
@@ -46,12 +45,6 @@ public class InMemoryUserAuthenticationService extends InMemoryUserDetailsManage
         UserDetails user = this.loadUserByUsername(username);
         final String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
         this.updatePassword(user, encodedPassword);
-    }
-
-    @Override
-    public void deleteUser(String username) {
-        final UserDetails user = this.loadUserByUsername(username);
-        super.deleteUser(user.getUsername());
     }
 
     private String getPasswordFromCurrentAuthenticatedUser() {

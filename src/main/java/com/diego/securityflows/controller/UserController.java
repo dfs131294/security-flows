@@ -34,21 +34,21 @@ public class UserController {
         return ResponseEntity.ok("User updated successfully");
     }
 
-    @PutMapping("/password/change")
-    public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequestDTO request) {
-        inMemoryUserAuthenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
-        return ResponseEntity.ok("User password changed successfully");
-    }
-
     @PutMapping("/password")
     public ResponseEntity<String> updatePassword(@RequestBody @Valid UpdatePasswordRequestDTO request) {
         inMemoryUserAuthenticationService.updatePassword(request.getEmail(), request.getNewPassword());
         return ResponseEntity.ok("User password updated successfully");
     }
 
+    @PutMapping("/password/change")
+    public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequestDTO request) {
+        inMemoryUserAuthenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
+        return ResponseEntity.ok("User password changed successfully");
+    }
+
     @DeleteMapping
     public ResponseEntity<String> delete(@RequestBody @Valid DeleteUserRequestDTO request) {
-        inMemoryUserAuthenticationService.deleteUser(request.getEmail());
+        inMemoryUserService.delete(request.getEmail());
         return ResponseEntity.ok("User deleted successfully");
     }
 }

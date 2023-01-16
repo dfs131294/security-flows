@@ -15,4 +15,6 @@ public interface UserService {
     void create(CreateUserRequestDTO userDTO);
 
     void update(String username, UserDTO userDTO);
+
+    void delete(String username);
 }

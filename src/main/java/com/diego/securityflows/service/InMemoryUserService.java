@@ -6,6 +6,7 @@ import com.diego.securityflows.dto.UserDTO;
 import com.diego.securityflows.entity.User;
 import com.diego.securityflows.util.StringUtils;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,12 @@ public class InMemoryUserService implements UserService {
         }
         inMemoryUserAuthenticationService.createUser(user);
         inMemoryUserAuthenticationService.deleteUser(username);
+    }
+
+    @Override
+    public void delete(String username) {
+        final UserDetails user = inMemoryUserAuthenticationService.loadUserByUsername(username);
+        inMemoryUserAuthenticationService.deleteUser(user.getUsername());
     }
 
     private User buildUser(CreateUserRequestDTO userDTO, String encodedPassword) {
