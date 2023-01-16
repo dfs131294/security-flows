@@ -35,12 +35,14 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public User find(String username) {
-        return inMemoryUserAuthenticationService.getUsers()
-                .stream()
-                .filter(u -> username.equals(u.getUsername()))
-                .findFirst()
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+    public UserDTO find(String username) {
+        final User user = inMemoryUserAuthenticationService.getUser(username);
+        return UserDTO.builder()
+                .firstname(user.getFirstname())
+                .lastname(user.getLastname())
+                .email(user.getUsername())
+                .role(user.getRole().name())
+                .build();
     }
 
     @Override
@@ -52,7 +54,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public void update(String username, UserDTO userDTO) {
-        final User currentUser = this.find(username);
+        final User currentUser = inMemoryUserAuthenticationService.getUser(username);
         final User user = this.buildUserToUpdate(currentUser, userDTO);
         // This is because Spring security in memory service does not allow for username updates
         if (currentUser.getUsername().equals(user.getUsername())) {

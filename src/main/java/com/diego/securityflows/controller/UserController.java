@@ -23,6 +23,11 @@ public class UserController {
     private final InMemoryUserAuthenticationService inMemoryUserAuthenticationService;
     private final InMemoryUserService inMemoryUserService;
 
+    @GetMapping("{username}")
+    public ResponseEntity<UserDTO> find(@PathVariable String username) {
+        return ResponseEntity.ok(inMemoryUserService.find(username));
+    }
+
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {
         return ResponseEntity.ok(inMemoryUserService.findAll());

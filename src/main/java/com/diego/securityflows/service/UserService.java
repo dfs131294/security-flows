@@ -10,7 +10,7 @@ public interface UserService {
 
     List<UserDTO> findAll();
 
-    User find(String username);
+    UserDTO find(String username);
 
     void create(CreateUserRequestDTO userDTO);
 

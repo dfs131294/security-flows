@@ -8,6 +8,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,14 @@ import java.util.stream.Collectors;
 public class InMemoryUserAuthenticationService extends InMemoryUserDetailsManager {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    public User getUser(String username) {
+        return this.getUsers()
+                .stream()
+                .filter(u -> username.equals(u.getUsername()))
+                .findFirst()
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+    }
 
     public List<User> getUsers() {
         return this.getInMemoryUsers()
