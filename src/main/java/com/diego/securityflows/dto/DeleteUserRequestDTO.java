@@ -12,5 +12,5 @@ public class DeleteUserRequestDTO {
 
     @NotEmpty(message = "Email should not be empty")
     @Email(message = "Email must have a valid format")
-    private String username;
+    private String email;
 }

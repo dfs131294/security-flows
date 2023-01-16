@@ -12,7 +12,7 @@ public class UpdatePasswordRequestDTO {
 
     @NotEmpty(message = "Email should not be empty")
     @Email(message = "Email must have a valid format")
-    private String username;
+    private String email;
 
     @NotEmpty(message = "New password should not be empty")
     private String newPassword;

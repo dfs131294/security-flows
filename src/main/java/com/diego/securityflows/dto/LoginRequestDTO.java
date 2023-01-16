@@ -12,7 +12,7 @@ public class LoginRequestDTO {
 
     @NotEmpty(message = "Email should not be empty")
     @Email(message = "Email must have a valid format")
-    private String username;
+    private String email;
 
     @NotEmpty(message = "Password should not be empty")
     private String password;

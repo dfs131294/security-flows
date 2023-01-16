@@ -2,9 +2,11 @@ package com.diego.securityflows.security.jwt;
 
 import com.diego.securityflows.service.InMemoryUserAuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -36,29 +38,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader(AUTHORIZATION_HEADER);
         final UserDetails userDetails;
         final String jwt;
-
         if (Objects.isNull(authHeader) || !authHeader.startsWith(BEARER_TOKEN_STARTER)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         jwt = authHeader.substring(7);
-
         try {
-            final String userEmail = jwtService.getUsername(jwt);
-
-            if (Objects.isNull(userEmail) || Objects.nonNull(SecurityContextHolder.getContext().getAuthentication())) {
+            final String email = jwtService.getUsername(jwt);
+            if (Objects.isNull(email) || Objects.nonNull(SecurityContextHolder.getContext().getAuthentication())) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            userDetails = inMemoryUserAuthenticationService.loadUserByUsername(userEmail);
-
+            userDetails = inMemoryUserAuthenticationService.loadUserByUsername(email);
             if (Objects.isNull(userDetails) || !jwtService.isTokenValid(jwt, userDetails)) {
                 filterChain.doFilter(request, response);
                 return;
             }
+
         } catch (Exception e) {
+            if (e instanceof UsernameNotFoundException) {
+                handlerExceptionResolver.resolveException(request, response, null, new AccessDeniedException(""));
+                return;
+            }
+
             handlerExceptionResolver.resolveException(request, response, null, e);
             return;
         }
@@ -68,11 +72,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 null,
                 userDetails.getAuthorities()
         );
-
         authToken.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request)
         );
-
         SecurityContextHolder.getContext().setAuthentication(authToken);
         filterChain.doFilter(request, response);
     }

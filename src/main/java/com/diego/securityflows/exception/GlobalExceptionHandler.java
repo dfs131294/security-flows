@@ -29,7 +29,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final String INVALID_JWT_TOKEN_MESSAGE = "Invalid JWT Token";
     private static final String INVALID_PAYLOAD_MESSAGE = "Invalid Payload";
     private static final String USER_NOT_FOUND_MESSAGE = "User with username '%s' not found";
-    private static final String ACCESS_DENIED_MESSAGE = "Unauthorized";
+    private static final String UNAUTHORIZED_MESSAGE = "UNAUTHORIZED";
 
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<Object> handleJwtException(Exception ex, WebRequest request) {
@@ -62,19 +62,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(SecurityFlowsExceptionDTO.builder()
-                        .httpStatus(HttpStatus.BAD_REQUEST)
-                        .message(ACCESS_DENIED_MESSAGE)
+                        .httpStatus(HttpStatus.UNAUTHORIZED)
+                        .message(UNAUTHORIZED_MESSAGE)
                         .timestamp(ZonedDateTime.now())
                         .build());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Object> handleBadCredentialsException(Exception ex, WebRequest request) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(SecurityFlowsExceptionDTO.builder()
-                        .httpStatus(HttpStatus.UNAUTHORIZED)
+                        .httpStatus(HttpStatus.BAD_REQUEST)
                         .message(ex.getMessage())
                         .timestamp(ZonedDateTime.now())
                         .build());

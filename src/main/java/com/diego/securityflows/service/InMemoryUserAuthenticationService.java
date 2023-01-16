@@ -1,7 +1,5 @@
 package com.diego.securityflows.service;
 
-import com.diego.securityflows.domain.Role;
-import com.diego.securityflows.dto.CreateUserRequestDTO;
 import com.diego.securityflows.entity.User;
 import com.diego.securityflows.exception.SecurityFlowException;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +34,6 @@ public class InMemoryUserAuthenticationService extends InMemoryUserDetailsManage
                 .collect(Collectors.toList());
     }
 
-    public void createUser(CreateUserRequestDTO request) {
-        final String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
-        final User user = this.buildUser(request, encodedPassword);
-        super.createUser(user);
-    }
-
     @Override
     public void changePassword(String oldPassword, String newPassword) {
         final String currentAuthenticatedUserPassword = this.getPasswordFromCurrentAuthenticatedUser();
@@ -62,16 +54,6 @@ public class InMemoryUserAuthenticationService extends InMemoryUserDetailsManage
         super.deleteUser(user.getUsername());
     }
 
-    private User buildUser(CreateUserRequestDTO request, String encodedPassword) {
-        return User.builder()
-                .email(request.getUsername())
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .password(encodedPassword)
-                .role(Role.valueOf(request.getRole()))
-                .build();
-    }
-
     private String getPasswordFromCurrentAuthenticatedUser() {
         final Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
         if (Objects.isNull(currentUser)) {
@@ -82,7 +64,7 @@ public class InMemoryUserAuthenticationService extends InMemoryUserDetailsManage
 
     private void validateOldPassword(String oldPassword, String currentAuthenticatedUserPassword) {
         if (!bCryptPasswordEncoder.matches(oldPassword, currentAuthenticatedUserPassword)) {
-            throw new SecurityFlowException("Old Password does not match with current user registered password");
+            throw new SecurityFlowException("Old Password does not match with current authenticated user password");
         }
     }
 

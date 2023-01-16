@@ -21,6 +21,8 @@ import java.util.List;
 @Table(name = "SF_USER")
 public class User implements UserDetails {
 
+    private static final String ROLE_STARTER = "ROLE_";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,7 +52,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority(ROLE_STARTER + role.name()));
     }
 
     @Override
