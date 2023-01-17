@@ -1,5 +1,6 @@
 package com.diego.securityflows.service;
 
+import com.diego.securityflows.domain.Role;
 import com.diego.securityflows.dto.CreateUserRequestDTO;
 import com.diego.securityflows.dto.UpdateUserRequestDTO;
 import com.diego.securityflows.dto.UserDTO;
@@ -30,7 +31,7 @@ public class InMemoryUserService implements UserService {
                         .firstname(u.getFirstname())
                         .lastname(u.getLastname())
                         .email(u.getUsername())
-                        .roles(User.getRolesFromEnum(u.getRoles()))
+                        .roles(Role.asString(u.getRoles()))
                         .build())
                 .collect(Collectors.toList());
     }
@@ -42,7 +43,7 @@ public class InMemoryUserService implements UserService {
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
                 .email(user.getUsername())
-                .roles(User.getRolesFromEnum(user.getRoles()))
+                .roles(Role.asString(user.getRoles()))
                 .build();
     }
 
@@ -81,20 +82,20 @@ public class InMemoryUserService implements UserService {
                 .firstname(userDTO.getFirstname())
                 .lastname(userDTO.getLastname())
                 .password(encodedPassword)
-                .roles(User.getRolesFromString(userDTO.getRoles()))
+                .roles(Role.fromString(userDTO.getRoles()))
                 .build();
     }
 
     private User buildUserToUpdate(User user, UpdateUserRequestDTO userDTO) {
         final List<String> roles = StringUtils.getNonEmptyValues(userDTO.getRoles(),
-                User.getRolesFromEnum(user.getRoles()));
+                Role.asString(user.getRoles()));
 
         return User.builder()
                 .email(StringUtils.getNonEmptyValue(userDTO.getEmail(), user.getUsername()))
                 .password(user.getPassword())
                 .firstname(StringUtils.getNonEmptyValue(userDTO.getFirstname(), user.getFirstname()))
                 .lastname(StringUtils.getNonEmptyValue(userDTO.getLastname(), user.getLastname()))
-                .roles(User.getRolesFromString(roles))
+                .roles(Role.fromString(roles))
                 .build();
     }
 }

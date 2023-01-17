@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -56,9 +55,10 @@ public class JwtService {
         if (CollectionUtils.isEmpty(authorities)) {
             return null;
         }
+
         return Collections.singletonMap(ROLES_CLAIM, authorities.stream()
                 .map(GrantedAuthority::getAuthority)
-                .map(a -> a.replace(Constants.ROLE_STARTER, ""))
+                .map(this::replaceRoleStarter)
                 .collect(Collectors.toList()));
     }
 
@@ -68,5 +68,9 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    private String replaceRoleStarter(String authority) {
+       return authority.replace(Constants.ROLE_STARTER, "");
     }
 }

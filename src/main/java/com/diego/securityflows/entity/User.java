@@ -52,7 +52,8 @@ public class User implements UserDetails {
             this.roles = getDefaultRole();
             return;
         }
-        this.roles = getRolesFromString(roles);
+
+        this.roles = Role.fromString(roles);
     }
 
     @Override
@@ -91,19 +92,7 @@ public class User implements UserDetails {
         return true;
     }
 
-    public static List<String> getRolesFromEnum(List<Role> roles) {
-        return roles.stream()
-                .map(Role::name)
-                .collect(Collectors.toList());
-    }
-
     public static List<Role> getDefaultRole() {
         return Collections.singletonList(Role.USER);
-    }
-
-    public static List<Role> getRolesFromString(List<String> roles) {
-        return roles.stream()
-                .map(Role::valueOf)
-                .collect(Collectors.toList());
     }
 }
