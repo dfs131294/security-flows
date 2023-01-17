@@ -2,15 +2,18 @@ package com.diego.securityflows.controller;
 
 import com.diego.securityflows.dto.CreateUserRequestDTO;
 import com.diego.securityflows.dto.LoginRequestDTO;
-import com.diego.securityflows.dto.UserDTO;
 import com.diego.securityflows.security.jwt.JwtService;
-import com.diego.securityflows.service.InMemoryUserAuthenticationService;
 import com.diego.securityflows.service.InMemoryUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -28,8 +31,8 @@ public class AuthenticationController {
         final String username = request.getEmail();
         final String password = request.getPassword();
         final UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
-        jwtAuthenticationManager.authenticate(token);
-        return ResponseEntity.ok(jwtService.generate(username));
+        Authentication authentication = jwtAuthenticationManager.authenticate(token);
+        return ResponseEntity.ok(jwtService.generate((UserDetails) authentication.getPrincipal()));
     }
 
     @PostMapping("register")

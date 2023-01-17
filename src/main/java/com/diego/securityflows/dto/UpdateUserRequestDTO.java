@@ -7,29 +7,23 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-public class UserDTO {
+@Builder
+public class UpdateUserRequestDTO {
 
-    @NotEmpty(message = "Email should not be empty")
     @Email(message = "Email must have a valid format")
     private String email;
 
-    @NotEmpty(message = "Firstname should not be empty")
     private String firstname;
 
-    @NotEmpty(message = "Lastname should not be empty")
     private String lastname;
 
-    @NotEmpty(message = "Role should not be empty")
     @UniqueValues(message = "Role should be unique")
     @ValueOfEnum(enumClass = Role.class, message = "Role should be USER or ADMIN")
     private List<String> roles;

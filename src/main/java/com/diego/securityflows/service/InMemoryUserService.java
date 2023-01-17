@@ -1,13 +1,13 @@
 package com.diego.securityflows.service;
 
-import com.diego.securityflows.domain.Role;
 import com.diego.securityflows.dto.CreateUserRequestDTO;
+import com.diego.securityflows.dto.UpdateUserRequestDTO;
 import com.diego.securityflows.dto.UserDTO;
 import com.diego.securityflows.entity.User;
 import com.diego.securityflows.util.StringUtils;
+import com.diego.securityflows.validation.Validator;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class InMemoryUserService implements UserService {
 
+    private final Validator validator;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final InMemoryUserAuthenticationService inMemoryUserAuthenticationService;
 
@@ -29,7 +30,7 @@ public class InMemoryUserService implements UserService {
                         .firstname(u.getFirstname())
                         .lastname(u.getLastname())
                         .email(u.getUsername())
-                        .role(u.getRole().name())
+                        .roles(User.getRolesFromEnum(u.getRoles()))
                         .build())
                 .collect(Collectors.toList());
     }
@@ -41,19 +42,21 @@ public class InMemoryUserService implements UserService {
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
                 .email(user.getUsername())
-                .role(user.getRole().name())
+                .roles(User.getRolesFromEnum(user.getRoles()))
                 .build();
     }
 
     @Override
     public void create(CreateUserRequestDTO userDTO) {
+        validator.validate(userDTO);
         final String encodedPassword = bCryptPasswordEncoder.encode(userDTO.getPassword());
         final User user = this.buildUser(userDTO, encodedPassword);
         inMemoryUserAuthenticationService.createUser(user);
     }
 
     @Override
-    public void update(String username, UserDTO userDTO) {
+    public void update(String username, UpdateUserRequestDTO userDTO) {
+        validator.validate(userDTO);
         final User currentUser = inMemoryUserAuthenticationService.getUser(username);
         final User user = this.buildUserToUpdate(currentUser, userDTO);
         // This is because Spring security in memory service does not allow for username updates
@@ -61,6 +64,7 @@ public class InMemoryUserService implements UserService {
             inMemoryUserAuthenticationService.updateUser(user);
             return;
         }
+
         inMemoryUserAuthenticationService.createUser(user);
         inMemoryUserAuthenticationService.deleteUser(username);
     }
@@ -77,17 +81,20 @@ public class InMemoryUserService implements UserService {
                 .firstname(userDTO.getFirstname())
                 .lastname(userDTO.getLastname())
                 .password(encodedPassword)
-                .role(Role.valueOf(userDTO.getRole()))
+                .roles(User.getRolesFromString(userDTO.getRoles()))
                 .build();
     }
 
-    private User buildUserToUpdate(User user, UserDTO userDTO) {
+    private User buildUserToUpdate(User user, UpdateUserRequestDTO userDTO) {
+        final List<String> roles = StringUtils.getNonEmptyValues(userDTO.getRoles(),
+                User.getRolesFromEnum(user.getRoles()));
+
         return User.builder()
                 .email(StringUtils.getNonEmptyValue(userDTO.getEmail(), user.getUsername()))
                 .password(user.getPassword())
                 .firstname(StringUtils.getNonEmptyValue(userDTO.getFirstname(), user.getFirstname()))
                 .lastname(StringUtils.getNonEmptyValue(userDTO.getLastname(), user.getLastname()))
-                .role(Role.valueOf(StringUtils.getNonEmptyValue(userDTO.getRole(), user.getRole().name())))
+                .roles(User.getRolesFromString(roles))
                 .build();
     }
 }

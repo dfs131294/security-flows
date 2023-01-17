@@ -1,8 +1,8 @@
 package com.diego.securityflows.service;
 
 import com.diego.securityflows.dto.CreateUserRequestDTO;
+import com.diego.securityflows.dto.UpdateUserRequestDTO;
 import com.diego.securityflows.dto.UserDTO;
-import com.diego.securityflows.entity.User;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public interface UserService {
 
     void create(CreateUserRequestDTO userDTO);
 
-    void update(String username, UserDTO userDTO);
+    void update(String username, UpdateUserRequestDTO userDTO);
 
     void delete(String username);
 }

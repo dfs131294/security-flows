@@ -1,9 +1,6 @@
 package com.diego.securityflows.controller;
 
-import com.diego.securityflows.dto.ChangePasswordRequestDTO;
-import com.diego.securityflows.dto.DeleteUserRequestDTO;
-import com.diego.securityflows.dto.UpdatePasswordRequestDTO;
-import com.diego.securityflows.dto.UserDTO;
+import com.diego.securityflows.dto.*;
 import com.diego.securityflows.service.InMemoryUserAuthenticationService;
 import com.diego.securityflows.service.InMemoryUserService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +31,7 @@ public class UserController {
     }
 
     @PutMapping("{username}")
-    public ResponseEntity<String> update(@PathVariable String username, @RequestBody UserDTO request) {
+    public ResponseEntity<String> update(@PathVariable String username, @RequestBody @Valid UpdateUserRequestDTO request) {
         inMemoryUserService.update(username, request);
         return ResponseEntity.ok("User updated successfully");
     }

@@ -1,5 +1,6 @@
 package com.diego.securityflows.entity;
 
+import com.diego.securityflows.common.Constants;
 import com.diego.securityflows.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,23 +9,24 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "SF_USER")
+//@Entity
+//@Table(name = "SF_USER")
 public class User implements UserDetails {
 
-    private static final String ROLE_STARTER = "ROLE_";
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String firstname;
@@ -35,26 +37,30 @@ public class User implements UserDetails {
 
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private List<Role> roles;
 
     public User(String email, String password) {
         this.email = email;
         this.password = password;
-        this.role = Role.USER;
+        this.roles = getDefaultRole();
     }
 
-    public User(String email, String password, String role) {
+    public User(String email, String password, List<String> roles) {
         this.email = email;
         this.password = password;
-        this.role = Role.valueOf(role);
+        if (CollectionUtils.isEmpty(roles)) {
+            this.roles = getDefaultRole();
+            return;
+        }
+        this.roles = getRolesFromString(roles);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(ROLE_STARTER + role.name()));
+        return this.roles.stream()
+                .map(r -> new SimpleGrantedAuthority(Constants.ROLE_STARTER + r.name()))
+                .collect(Collectors.toList());
     }
-
     @Override
     public String getPassword() {
         return password;
@@ -83,5 +89,21 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public static List<String> getRolesFromEnum(List<Role> roles) {
+        return roles.stream()
+                .map(Role::name)
+                .collect(Collectors.toList());
+    }
+
+    public static List<Role> getDefaultRole() {
+        return Collections.singletonList(Role.USER);
+    }
+
+    public static List<Role> getRolesFromString(List<String> roles) {
+        return roles.stream()
+                .map(Role::valueOf)
+                .collect(Collectors.toList());
     }
 }

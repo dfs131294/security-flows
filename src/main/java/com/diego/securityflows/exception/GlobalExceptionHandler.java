@@ -88,7 +88,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .getAllErrors()
                 .stream()
                 .collect(Collectors.toMap(getKeyFromError(), getValueFromError()));
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(SecurityFlowsExceptionDTO.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST)

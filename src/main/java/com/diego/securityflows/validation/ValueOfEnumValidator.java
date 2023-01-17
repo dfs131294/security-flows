@@ -1,13 +1,14 @@
 package com.diego.securityflows.validation;
 
+import org.springframework.util.CollectionUtils;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, CharSequence> {
+public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, List<String>> {
 
     private List<String> acceptedValues;
 
@@ -19,11 +20,13 @@ public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, Ch
     }
 
     @Override
-    public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
-        if (Objects.isNull(value)) {
+    public boolean isValid(List<String> values, ConstraintValidatorContext context) {
+        if (CollectionUtils.isEmpty(values)) {
             return true;
         }
 
-        return acceptedValues.contains(value.toString());
+        return values.stream()
+                .allMatch(av -> acceptedValues.stream()
+                        .anyMatch(v -> v.equals(av)));
     }
 }

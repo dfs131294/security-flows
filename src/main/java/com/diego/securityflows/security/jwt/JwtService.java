@@ -1,27 +1,36 @@
 package com.diego.securityflows.security.jwt;
 
+import com.diego.securityflows.common.Constants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.security.Key;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class JwtService {
 
+    private final static String ISSUER = "security-flows";
+    private final static String ROLES_CLAIM = "roles";
     private static final int EXPIRE_MS = 300 * 1000;
-
     private final static Key KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    public String generate(String username) {
+    public String generate(UserDetails user) {
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuer("security-flows")
+                .setSubject(user.getUsername())
+                .setIssuer(ISSUER)
+                .addClaims(this.getRoleClaims(user.getAuthorities()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_MS))
                 .signWith(KEY)
@@ -41,6 +50,16 @@ public class JwtService {
         final Claims claims = getClaims(token);
         return claims.getExpiration()
                 .before(new Date(System.currentTimeMillis()));
+    }
+
+    private Map<String, Object> getRoleClaims(Collection<? extends GrantedAuthority> authorities) {
+        if (CollectionUtils.isEmpty(authorities)) {
+            return null;
+        }
+        return Collections.singletonMap(ROLES_CLAIM, authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(a -> a.replace(Constants.ROLE_STARTER, ""))
+                .collect(Collectors.toList()));
     }
 
     private Claims getClaims(String token) {

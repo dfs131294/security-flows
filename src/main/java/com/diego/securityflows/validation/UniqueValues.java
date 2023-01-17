@@ -1,6 +1,6 @@
 package com.diego.securityflows.validation;
 
-import com.diego.securityflows.validation.ValueOfEnum.List;
+import com.diego.securityflows.validation.UniqueValues.List;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -9,13 +9,11 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Constraint(validatedBy = ValueOfEnumValidator.class)
+@Constraint(validatedBy = UniqueValuesValidator.class)
 @Repeatable(List.class)
-public @interface ValueOfEnum {
+public @interface UniqueValues {
 
-    Class<? extends Enum<?>> enumClass();
-
-    String message() default "Invalid value";
+    String message() default "Values should be unique";
 
     Class<?>[] groups() default {};
 
@@ -25,6 +23,6 @@ public @interface ValueOfEnum {
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     public @interface List {
-        ValueOfEnum[] value();
+        UniqueValues[] value();
     }
 }
