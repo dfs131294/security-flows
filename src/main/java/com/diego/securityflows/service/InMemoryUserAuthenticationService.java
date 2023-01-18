@@ -72,17 +72,17 @@ public class InMemoryUserAuthenticationService extends InMemoryUserDetailsManage
 
     @SuppressWarnings({ "unchecked", "ConstantConditions" })
     private Map<String, Object> getInMemoryUsers() {
-        Field users = ReflectionUtils.findField(this.getClass().getSuperclass(), "users");
-        ReflectionUtils.makeAccessible(users);
-        return (Map<String, Object>) ReflectionUtils.getField(users, this);
+        Field userField = ReflectionUtils.findField(this.getClass().getSuperclass(), "users");
+        ReflectionUtils.makeAccessible(userField);
+        return (Map<String, Object>) ReflectionUtils.getField(userField, this);
     }
 
     @SuppressWarnings({ "ConstantConditions" })
     private User mapToUser(Object mutableUser) {
         try {
-            Field delegate = ReflectionUtils.findField(mutableUser.getClass(), "delegate");
-            ReflectionUtils.makeAccessible(delegate);
-            return (User) ReflectionUtils.getField(delegate, mutableUser);
+            Field delegateField = ReflectionUtils.findField(mutableUser.getClass(), "delegate");
+            ReflectionUtils.makeAccessible(delegateField);
+            return (User) ReflectionUtils.getField(delegateField, mutableUser);
         } catch (Exception e) {
             throw new SecurityFlowException("Internal Error");
         }
