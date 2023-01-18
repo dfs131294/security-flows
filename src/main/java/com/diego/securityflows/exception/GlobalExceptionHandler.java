@@ -120,7 +120,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             }
 
             if (Objects.nonNull(error.getCodes())) {
-                boolean comesFromValueOfEnumAnnotation = Arrays.stream(error.getCodes())
+                final boolean comesFromValueOfEnumAnnotation = Arrays.stream(error.getCodes())
                         .anyMatch(c -> c.contains(ENUM_VALIDATOR_ANNOTATION));
                 if (comesFromValueOfEnumAnnotation) {
                     final Class<?> enumClass = this.getEnumClass(error);
@@ -129,7 +129,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         return message.replaceAll("%s", "");
                     }
 
-                    final String joinedEnumConstants = this.joinEnumConstants(enumConstants);
+                    final String joinedEnumConstants = this.getJoinedEnumConstants(enumConstants);
                     return String.format(message, joinedEnumConstants);
                 }
             }
@@ -153,7 +153,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .collect(Collectors.toList());
     }
 
-    private String joinEnumConstants(List<String> enumConstants) {
+    private String getJoinedEnumConstants(List<String> enumConstants) {
         final String joinedByConjunction = String.join(ENUM_INVALID_MESSAGE_SEPARATOR_CONJUCTION,
                 enumConstants.subList(enumConstants.size() - 2, enumConstants.size()));
         if (enumConstants.size() == 2) {
