@@ -4,7 +4,6 @@ import com.diego.securityflows.domain.Role;
 import com.diego.securityflows.validation.UniqueValues;
 import com.diego.securityflows.validation.ValueOfEnum;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -30,7 +29,7 @@ public class UserDTO {
     private String lastname;
 
     @NotEmpty(message = "Role should not be empty")
-    @UniqueValues(message = "Role should be unique")
-    @ValueOfEnum(enumClass = Role.class, message = "Role should be USER or ADMIN")
+    @UniqueValues(message = "Roles should be unique")
+    @ValueOfEnum(enumClass = Role.class, message = "Roles should be %s")
     private List<String> roles;
 }

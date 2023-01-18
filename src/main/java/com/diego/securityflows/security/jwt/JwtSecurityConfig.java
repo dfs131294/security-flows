@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -14,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -45,11 +48,14 @@ public class JwtSecurityConfig {
                 .and()
                 .headers().frameOptions().disable()
                 .and()
-                .authorizeHttpRequests()
+                .authorizeRequests()
+                .expressionHandler(webSecurityExpressionHandler())
                 .antMatchers("/auth/**", "/h2/**").permitAll()
                 .antMatchers("/external/**").permitAll()
+                .antMatchers("/users/").hasRole("USER")
                 .antMatchers(HttpMethod.DELETE, "/users").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PUT, "/users/password").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/users/**").hasRole("OPERATOR")
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
@@ -58,5 +64,19 @@ public class JwtSecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        final String hierarchy = "ROLE_ADMIN > ROLE_OPERATOR > ROLE_USER > ROLE_GUEST";
+        roleHierarchy.setHierarchy(hierarchy);
+        return roleHierarchy;
+    }
+
+    private DefaultWebSecurityExpressionHandler webSecurityExpressionHandler() {
+        DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy());
+        return expressionHandler;
     }
 }

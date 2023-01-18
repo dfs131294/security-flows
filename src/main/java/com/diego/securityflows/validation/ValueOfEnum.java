@@ -15,7 +15,7 @@ public @interface ValueOfEnum {
 
     Class<? extends Enum<?>> enumClass();
 
-    String message() default "Invalid value";
+    String message() default "Invalid Value";
 
     Class<?>[] groups() default {};
 

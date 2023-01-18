@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public enum Role {
+
+    ADMIN,
+    OPERATOR,
     USER,
-    ADMIN;
+    GUEST;
 
     public static List<Role> fromString(List<String> roles) {
         return roles.stream()
