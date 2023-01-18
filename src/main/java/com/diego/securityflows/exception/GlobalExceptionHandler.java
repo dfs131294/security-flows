@@ -98,7 +98,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         final Map<String, String> errors = ex.getBindingResult()
                 .getAllErrors()
                 .stream()
-                .collect(Collectors.toMap(getKeyFromError(), getValueFromError()));
+                .collect(Collectors.toMap(this.getKeyFromError(), this.getValueFromError()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(SecurityFlowsExceptionDTO.builder()
                         .httpStatus(HttpStatus.BAD_REQUEST)
@@ -126,7 +126,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                     final Class<?> enumClass = this.getEnumClass(error);
                     final List<String> enumConstants = this.getEnumConstants(enumClass);
                     if (CollectionUtils.isEmpty(enumConstants)) {
-                        return message;
+                        return message.replaceAll("%s", "");
                     }
 
                     final String joinedEnumConstants = this.joinEnumConstants(enumConstants);
@@ -154,10 +154,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private String joinEnumConstants(List<String> enumConstants) {
-        final String joinedByCommas = String.join(ENUM_INVALID_MESSAGE_SEPARATOR_DELIMITER,
-                enumConstants.subList(0, enumConstants.size() - 2));
         final String joinedByConjunction = String.join(ENUM_INVALID_MESSAGE_SEPARATOR_CONJUCTION,
                 enumConstants.subList(enumConstants.size() - 2, enumConstants.size()));
+        if (enumConstants.size() == 2) {
+            return joinedByConjunction;
+        }
+
+        final String joinedByCommas = String.join(ENUM_INVALID_MESSAGE_SEPARATOR_DELIMITER,
+                enumConstants.subList(0, enumConstants.size() - 2));
         return String.format("%s, %s", joinedByCommas, joinedByConjunction);
     }
 }
