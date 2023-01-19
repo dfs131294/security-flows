@@ -2,6 +2,7 @@ package com.diego.securityflows.security.jwt;
 
 import com.diego.securityflows.common.Constants;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -40,9 +41,11 @@ public class JwtService {
         return getClaims(token).getSubject();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String userName = this.getUsername(token);
-        return userName.equals(userDetails.getUsername()) && !isExpired(token);
+    public void validateToken(String token) {
+        this.validateTokenKey(token);
+        if (this.isExpired(token)) {
+           throw new JwtException("Invalid Token");
+        }
     }
 
     public boolean isExpired(String token) {
@@ -60,6 +63,13 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .map(this::replaceRoleStarter)
                 .collect(Collectors.toList()));
+    }
+
+    private void validateTokenKey(String token) {
+        Jwts.parserBuilder()
+                .setSigningKey(KEY)
+                .build()
+                .parseClaimsJws(token);
     }
 
     private Claims getClaims(String token) {

@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = this.getTokenFromHeader(authHeader);
-            this.validateToken(jwt);
+            jwtService.validateToken(jwt);
             final String username = jwtService.getUsername(jwt);
             userDetails = inMemoryUserAuthenticationService.loadUserByUsername(username);
         } catch (Exception e) {
@@ -74,11 +74,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getTokenFromHeader(String authHeader) {
         return authHeader.substring(7);
-    }
-
-    private void validateToken(String jwt) {
-        if (jwtService.isExpired(jwt)) {
-            throw new JwtException("Invalid JWT Token");
-        }
     }
 }
