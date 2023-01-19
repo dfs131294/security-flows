@@ -22,7 +22,7 @@ public class JwtService {
 
     private final static String ISSUER = "security-flows";
     private final static String ROLES_CLAIM = "roles";
-    private static final int EXPIRE_MS = 300 * 1000;
+    private static final int EXPIRE_MS = 120 * 1000;
     private final static Key KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public String generate(UserDetails user) {

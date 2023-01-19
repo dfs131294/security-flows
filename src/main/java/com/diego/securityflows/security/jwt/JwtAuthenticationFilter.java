@@ -1,6 +1,7 @@
 package com.diego.securityflows.security.jwt;
 
 import com.diego.securityflows.service.InMemoryUserAuthenticationService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,26 +38,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader(AUTHORIZATION_HEADER);
         final UserDetails userDetails;
-        final String jwt;
-        if (Objects.isNull(authHeader) || !authHeader.startsWith(BEARER_TOKEN_STARTER)) {
+        if (Objects.isNull(authHeader) || !authHeader.startsWith(BEARER_TOKEN_STARTER)
+                || Objects.nonNull(SecurityContextHolder.getContext().getAuthentication())) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwt = authHeader.substring(7);
         try {
-            final String email = jwtService.getUsername(jwt);
-            if (Objects.isNull(email) || Objects.nonNull(SecurityContextHolder.getContext().getAuthentication())) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            userDetails = inMemoryUserAuthenticationService.loadUserByUsername(email);
-            if (Objects.isNull(userDetails) || !jwtService.isTokenValid(jwt, userDetails)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
+            final String jwt = this.getTokenFromHeader(authHeader);
+            this.validateToken(jwt);
+            final String username = jwtService.getUsername(jwt);
+            userDetails = inMemoryUserAuthenticationService.loadUserByUsername(username);
         } catch (Exception e) {
             if (e instanceof UsernameNotFoundException) {
                 handlerExceptionResolver.resolveException(request, response, null, new AccessDeniedException(""));
@@ -75,7 +67,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         authToken.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request)
         );
+        SecurityContextHolder.createEmptyContext();
         SecurityContextHolder.getContext().setAuthentication(authToken);
         filterChain.doFilter(request, response);
+    }
+
+    private String getTokenFromHeader(String authHeader) {
+        return authHeader.substring(7);
+    }
+
+    private void validateToken(String jwt) {
+        if (jwtService.isExpired(jwt)) {
+            throw new JwtException("Invalid JWT Token");
+        }
     }
 }
