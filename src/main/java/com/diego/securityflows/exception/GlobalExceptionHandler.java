@@ -132,7 +132,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         return String.format(message, String.join("", enumConstants));
                     }
 
-                    final String joinedEnumConstants = this.getJoinedEnumConstants(enumConstants);
+                    final String joinedEnumConstants = this.joinEnumConstants(enumConstants);
                     return String.format(message, joinedEnumConstants);
                 }
             }
@@ -156,7 +156,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .collect(Collectors.toList());
     }
 
-    private String getJoinedEnumConstants(List<String> enumConstants) {
+    private String joinEnumConstants(List<String> enumConstants) {
         final String joinedByConjunction = String.join(ENUM_INVALID_MESSAGE_SEPARATOR_CONJUNCTION,
                 enumConstants.subList(enumConstants.size() - 2, enumConstants.size()));
         if (enumConstants.size() == 2) {
