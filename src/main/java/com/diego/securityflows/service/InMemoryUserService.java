@@ -21,11 +21,11 @@ public class InMemoryUserService implements UserService {
 
     private final Validator validator;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final InMemoryUserAuthenticationService inMemoryUserAuthenticationService;
+    private final InMemoryUserDetailsService inMemoryUserDetailsService;
 
     @Override
     public List<UserDTO> findAll() {
-        return inMemoryUserAuthenticationService.getUsers()
+        return inMemoryUserDetailsService.getUsers()
                 .stream()
                 .map(u -> UserDTO.builder()
                         .firstname(u.getFirstname())
@@ -38,7 +38,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public UserDTO find(String username) {
-        final User user = inMemoryUserAuthenticationService.getUser(username);
+        final User user = inMemoryUserDetailsService.getUser(username);
         return UserDTO.builder()
                 .firstname(user.getFirstname())
                 .lastname(user.getLastname())
@@ -52,28 +52,28 @@ public class InMemoryUserService implements UserService {
         validator.validate(userDTO);
         final String encodedPassword = bCryptPasswordEncoder.encode(userDTO.getPassword());
         final User user = this.buildUser(userDTO, encodedPassword);
-        inMemoryUserAuthenticationService.createUser(user);
+        inMemoryUserDetailsService.createUser(user);
     }
 
     @Override
     public void update(String username, UpdateUserRequestDTO userDTO) {
         validator.validate(userDTO);
-        final User currentUser = inMemoryUserAuthenticationService.getUser(username);
+        final User currentUser = inMemoryUserDetailsService.getUser(username);
         final User user = this.buildUserToUpdate(currentUser, userDTO);
         // This is because Spring security in memory service does not allow for username updates
         if (currentUser.getUsername().equals(user.getUsername())) {
-            inMemoryUserAuthenticationService.updateUser(user);
+            inMemoryUserDetailsService.updateUser(user);
             return;
         }
 
-        inMemoryUserAuthenticationService.createUser(user);
-        inMemoryUserAuthenticationService.deleteUser(username);
+        inMemoryUserDetailsService.createUser(user);
+        inMemoryUserDetailsService.deleteUser(username);
     }
 
     @Override
     public void delete(String username) {
-        final UserDetails user = inMemoryUserAuthenticationService.loadUserByUsername(username);
-        inMemoryUserAuthenticationService.deleteUser(user.getUsername());
+        final UserDetails user = inMemoryUserDetailsService.loadUserByUsername(username);
+        inMemoryUserDetailsService.deleteUser(user.getUsername());
     }
 
     private User buildUser(CreateUserRequestDTO userDTO, String encodedPassword) {

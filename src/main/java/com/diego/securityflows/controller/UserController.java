@@ -1,7 +1,7 @@
 package com.diego.securityflows.controller;
 
 import com.diego.securityflows.dto.*;
-import com.diego.securityflows.service.InMemoryUserAuthenticationService;
+import com.diego.securityflows.service.InMemoryUserDetailsService;
 import com.diego.securityflows.service.InMemoryUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 public class UserController {
 
-    private final InMemoryUserAuthenticationService inMemoryUserAuthenticationService;
+    private final InMemoryUserDetailsService inMemoryUserDetailsService;
     private final InMemoryUserService inMemoryUserService;
 
     @GetMapping("{username}")
@@ -38,13 +38,13 @@ public class UserController {
 
     @PutMapping("/password")
     public ResponseEntity<String> updatePassword(@RequestBody @Valid UpdatePasswordRequestDTO request) {
-        inMemoryUserAuthenticationService.updatePassword(request.getEmail(), request.getNewPassword());
+        inMemoryUserDetailsService.updatePassword(request.getEmail(), request.getNewPassword());
         return ResponseEntity.ok("User password updated successfully");
     }
 
     @PutMapping("/password/change")
     public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequestDTO request) {
-        inMemoryUserAuthenticationService.changePassword(request.getOldPassword(), request.getNewPassword());
+        inMemoryUserDetailsService.changePassword(request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok("User password changed successfully");
     }
 

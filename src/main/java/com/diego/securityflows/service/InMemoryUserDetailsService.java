@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class InMemoryUserAuthenticationService extends InMemoryUserDetailsManager {
+public class InMemoryUserDetailsService extends InMemoryUserDetailsManager {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -79,12 +79,8 @@ public class InMemoryUserAuthenticationService extends InMemoryUserDetailsManage
 
     @SuppressWarnings({ "ConstantConditions" })
     private User mapToUser(Object mutableUser) {
-        try {
-            Field delegateField = ReflectionUtils.findField(mutableUser.getClass(), "delegate");
-            ReflectionUtils.makeAccessible(delegateField);
-            return (User) ReflectionUtils.getField(delegateField, mutableUser);
-        } catch (Exception e) {
-            throw new SecurityFlowException("Internal Error");
-        }
+        Field delegateField = ReflectionUtils.findField(mutableUser.getClass(), "delegate");
+        ReflectionUtils.makeAccessible(delegateField);
+        return (User) ReflectionUtils.getField(delegateField, mutableUser);
     }
 }
