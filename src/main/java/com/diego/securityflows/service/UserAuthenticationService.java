@@ -38,7 +38,7 @@ public class UserAuthenticationService {
     }
 
     public LoginResponseDTO refreshToken(HttpServletRequest request) {
-        final String token = this.getRefreshTokenFromRequest(request);
+        final String token = this.parseRefreshTokenFromRequest(request);
         jwtService.validateRefreshToken(token);
         final String username = jwtService.getUsernameFromRefreshToken(token);
         final UserDetails userDetails = inMemoryUserDetailsService.loadUserByUsername(username);
@@ -48,10 +48,10 @@ public class UserAuthenticationService {
                 .build();
     }
 
-    private String getRefreshTokenFromRequest(HttpServletRequest request) {
+    private String parseRefreshTokenFromRequest(HttpServletRequest request) {
         final String refreshTokenHeader = request.getHeader(REFRESH_TOKEN_HEADER);
         if (!StringUtils.hasText(refreshTokenHeader)) {
-            throw new BadCredentialsException("Invalid Payload");
+            throw new BadCredentialsException("");
         }
 
         return refreshTokenHeader.substring(7);
