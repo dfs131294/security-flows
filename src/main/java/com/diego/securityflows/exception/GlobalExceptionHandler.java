@@ -40,7 +40,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final String ENUM_VALIDATOR_ANNOTATION = "ValueOfEnum";
     private static final String ENUM_INVALID_MESSAGE_SEPARATOR_DELIMITER = ", ";
-    private static final String ENUM_INVALID_MESSAGE_SEPARATOR_CONJUCTION = " OR ";
+    private static final String ENUM_INVALID_MESSAGE_SEPARATOR_CONJUNCTION = " OR ";
 
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<Object> handleJwtException(Exception ex, WebRequest request) {
@@ -154,7 +154,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private String getJoinedEnumConstants(List<String> enumConstants) {
-        final String joinedByConjunction = String.join(ENUM_INVALID_MESSAGE_SEPARATOR_CONJUCTION,
+        final String joinedByConjunction = String.join(ENUM_INVALID_MESSAGE_SEPARATOR_CONJUNCTION,
                 enumConstants.subList(enumConstants.size() - 2, enumConstants.size()));
         if (enumConstants.size() == 2) {
             return joinedByConjunction;
