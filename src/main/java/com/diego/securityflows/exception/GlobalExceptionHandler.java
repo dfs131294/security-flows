@@ -37,7 +37,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final String INVALID_PAYLOAD_MESSAGE = "Invalid Payload";
     private static final String USER_NOT_FOUND_MESSAGE = "User with username '%s' not found";
     private static final String UNAUTHORIZED_MESSAGE = "UNAUTHORIZED";
-
     private static final String ENUM_VALIDATOR_ANNOTATION = "ValueOfEnum";
     private static final String ENUM_INVALID_MESSAGE_SEPARATOR_DELIMITER = ", ";
     private static final String ENUM_INVALID_MESSAGE_SEPARATOR_CONJUNCTION = " OR ";
