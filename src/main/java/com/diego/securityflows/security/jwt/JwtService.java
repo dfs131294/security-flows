@@ -30,7 +30,7 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .setIssuer(ISSUER)
-                .addClaims(this.getRoleClaims(user.getAuthorities()))
+                .addClaims(this.mapAuthoritiesToRoleClaims(user.getAuthorities()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRE_MS))
                 .signWith(ACCESS_TOKEN_KEY)
@@ -82,7 +82,7 @@ public class JwtService {
                 .parseClaimsJws(token);
     }
 
-    private Map<String, Object> getRoleClaims(Collection<? extends GrantedAuthority> authorities) {
+    private Map<String, Object> mapAuthoritiesToRoleClaims(Collection<? extends GrantedAuthority> authorities) {
         if (CollectionUtils.isEmpty(authorities)) {
             return null;
         }
