@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            final String jwt = this.getTokenFromHeader(authHeader);
+            final String jwt = this.parseToken(authHeader);
             jwtService.validateAccessToken(jwt);
             final String username = jwtService.getUsernameFromAccessToken(jwt);
             userDetails = inMemoryUserDetailsService.loadUserByUsername(username);
@@ -71,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String getTokenFromHeader(String authHeader) {
+    private String parseToken(String authHeader) {
         return authHeader.substring(7);
     }
 }
