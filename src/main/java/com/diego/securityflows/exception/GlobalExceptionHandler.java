@@ -128,6 +128,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         return message.replaceAll("%s", "");
                     }
 
+                    if (enumConstants.size() == 1){
+                        return String.format(message, String.join("", enumConstants));
+                    }
+
                     final String joinedEnumConstants = this.getJoinedEnumConstants(enumConstants);
                     return String.format(message, joinedEnumConstants);
                 }

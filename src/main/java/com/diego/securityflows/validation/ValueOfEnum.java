@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Constraint(validatedBy = ValueOfEnumValidator.class)
+@Constraint(validatedBy = { ValueOfEnumValidator.class, ValueOfEnumListValidator.class })
 @Repeatable(List.class)
 public @interface ValueOfEnum {
 
