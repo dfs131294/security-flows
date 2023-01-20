@@ -58,6 +58,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        final UsernamePasswordAuthenticationToken authToken = this.buildAuthToken(request, userDetails);
+        SecurityContextHolder.createEmptyContext();
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+        filterChain.doFilter(request, response);
+    }
+
+    private String parseToken(String authHeader) {
+        return authHeader.substring(7);
+    }
+
+    private UsernamePasswordAuthenticationToken buildAuthToken(HttpServletRequest request, UserDetails userDetails) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 userDetails,
                 null,
@@ -66,12 +77,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         authToken.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request)
         );
-        SecurityContextHolder.createEmptyContext();
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-        filterChain.doFilter(request, response);
-    }
-
-    private String parseToken(String authHeader) {
-        return authHeader.substring(7);
+        return authToken;
     }
 }
