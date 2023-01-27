@@ -5,15 +5,16 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Component
-public class Validator {
+public class BeanValidator {
 
     private static final String ERRORS_DELIMITER = ", ";
-    private final javax.validation.Validator validator;
+    private final Validator validator;
 
     public <T> void validate(T o) {
         final Set<ConstraintViolation<T>> violations = validator.validate(o);

@@ -48,12 +48,7 @@ public class User implements UserDetails {
     public User(String email, String password, List<String> roles) {
         this.email = email;
         this.password = password;
-        if (CollectionUtils.isEmpty(roles)) {
-            this.roles = getDefaultRole();
-            return;
-        }
-
-        this.roles = Role.fromString(roles);
+        this.roles = CollectionUtils.isEmpty(roles) ? getDefaultRole() : Role.fromString(roles);
     }
 
     @Override

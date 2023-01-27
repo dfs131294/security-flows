@@ -6,7 +6,7 @@ import com.diego.securityflows.dto.UpdateUserRequestDTO;
 import com.diego.securityflows.dto.UserDTO;
 import com.diego.securityflows.entity.User;
 import com.diego.securityflows.util.StringUtils;
-import com.diego.securityflows.validation.Validator;
+import com.diego.securityflows.validation.BeanValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 @AllArgsConstructor
+@Service
 public class InMemoryUserService implements UserService {
 
-    private final Validator validator;
+    private final BeanValidator beanValidator;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final InMemoryUserDetailsService inMemoryUserDetailsService;
 
@@ -49,7 +49,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public void create(CreateUserRequestDTO userDTO) {
-        validator.validate(userDTO);
+        beanValidator.validate(userDTO);
         final String encodedPassword = bCryptPasswordEncoder.encode(userDTO.getPassword());
         final User user = this.buildUser(userDTO, encodedPassword);
         inMemoryUserDetailsService.createUser(user);
@@ -57,7 +57,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public void update(String username, UpdateUserRequestDTO userDTO) {
-        validator.validate(userDTO);
+        beanValidator.validate(userDTO);
         final User currentUser = inMemoryUserDetailsService.getUser(username);
         final User user = this.buildUserToUpdate(currentUser, userDTO);
         // This is because Spring security in memory service does not allow for username updates

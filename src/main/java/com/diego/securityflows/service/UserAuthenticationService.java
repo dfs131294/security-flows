@@ -3,7 +3,7 @@ package com.diego.securityflows.service;
 import com.diego.securityflows.dto.LoginRequestDTO;
 import com.diego.securityflows.dto.LoginResponseDTO;
 import com.diego.securityflows.security.jwt.JwtService;
-import com.diego.securityflows.validation.Validator;
+import com.diego.securityflows.validation.BeanValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,10 +23,10 @@ public class UserAuthenticationService {
     private final AuthenticationManager jwtAuthenticationManager;
     private final InMemoryUserDetailsService inMemoryUserDetailsService;
     private final JwtService jwtService;
-    private final Validator validator;
+    private final BeanValidator beanValidator;
 
     public LoginResponseDTO login(LoginRequestDTO request) {
-        validator.validate(request);
+        beanValidator.validate(request);
         final UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken
                 .unauthenticated(request.getEmail(), request.getPassword());
         final Authentication authentication = jwtAuthenticationManager.authenticate(token);
