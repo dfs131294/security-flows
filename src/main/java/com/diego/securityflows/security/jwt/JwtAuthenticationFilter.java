@@ -2,11 +2,10 @@ package com.diego.securityflows.security.jwt;
 
 import com.diego.securityflows.service.InMemoryUserDetailsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,13 +20,13 @@ import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_TOKEN_STARTER = "Bearer ";
     private final JwtService jwtService;
     private final InMemoryUserDetailsService inMemoryUserDetailsService;
-    private final HandlerExceptionResolver handlerExceptionResolver;
 
     @Override
     protected void doFilterInternal(
@@ -48,19 +47,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             jwtService.validateAccessToken(jwt);
             final String username = jwtService.getUsernameFromAccessToken(jwt);
             userDetails = inMemoryUserDetailsService.loadUserByUsername(username);
+            final UsernamePasswordAuthenticationToken authToken = this.buildAuthToken(request, userDetails);
+            SecurityContextHolder.createEmptyContext();
+            SecurityContextHolder.getContext().setAuthentication(authToken);
         } catch (Exception e) {
-            if (e instanceof UsernameNotFoundException) {
-                handlerExceptionResolver.resolveException(request, response, null, new AccessDeniedException(""));
-                return;
-            }
-
-            handlerExceptionResolver.resolveException(request, response, null, e);
-            return;
+            log.error(e.getMessage());
         }
 
-        final UsernamePasswordAuthenticationToken authToken = this.buildAuthToken(request, userDetails);
-        SecurityContextHolder.createEmptyContext();
-        SecurityContextHolder.getContext().setAuthentication(authToken);
         filterChain.doFilter(request, response);
     }
 

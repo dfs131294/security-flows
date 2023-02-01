@@ -15,11 +15,6 @@ public class SecurityFlowsApplication {
 		context = SpringApplication.run(SecurityFlowsApplication.class, args);
 	}
 
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
 	public static void restart() {
 		ApplicationArguments args = context.getBean(ApplicationArguments.class);
 

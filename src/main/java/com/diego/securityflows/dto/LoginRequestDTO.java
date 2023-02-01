@@ -16,4 +16,6 @@ public class LoginRequestDTO {
 
     @NotEmpty(message = "Password should not be empty")
     private String password;
+
+    private boolean rememberMe;
 }

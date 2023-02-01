@@ -4,37 +4,54 @@ import com.diego.securityflows.dto.LoginRequestDTO;
 import com.diego.securityflows.dto.LoginResponseDTO;
 import com.diego.securityflows.security.jwt.JwtService;
 import com.diego.securityflows.validation.BeanValidator;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserAuthenticationService {
 
     private static final String REFRESH_TOKEN_HEADER = "X-Auth-Refresh-Token";
+    private static final String REMEMBER_ME_COOKIE = "remember-me";
     private final AuthenticationManager jwtAuthenticationManager;
     private final InMemoryUserDetailsService inMemoryUserDetailsService;
     private final JwtService jwtService;
     private final BeanValidator beanValidator;
+    private final TokenBasedRememberMeServices tokenBasedRememberMeServices;
+    private final CookieService cookieService;
 
-    public LoginResponseDTO login(LoginRequestDTO request) {
-        beanValidator.validate(request);
+    public LoginResponseDTO login(LoginRequestDTO requestDTO, HttpServletRequest request, HttpServletResponse response) {
+        beanValidator.validate(requestDTO);
         final UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken
-                .unauthenticated(request.getEmail(), request.getPassword());
+                .unauthenticated(requestDTO.getEmail(), requestDTO.getPassword());
         final Authentication authentication = jwtAuthenticationManager.authenticate(token);
         final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        if (requestDTO.isRememberMe()) {
+            tokenBasedRememberMeServices.onLoginSuccess(request, response, authentication);
+        }
+
         return LoginResponseDTO.builder()
                 .accessToken(jwtService.generateAccessToken(userDetails))
                 .refreshToken(jwtService.generateRefreshToken(userDetails))
                 .build();
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        Cookie cookie = new Cookie(REMEMBER_ME_COOKIE, null);
+        cookie.setPath(this.getCookiePath(request));
+        cookie.setSecure(false);
+        cookieService.cancel(cookie, response);
     }
 
     public LoginResponseDTO refreshToken(HttpServletRequest request) {
@@ -55,5 +72,10 @@ public class UserAuthenticationService {
         }
 
         return refreshTokenHeader.substring(7);
+    }
+
+    private String getCookiePath(HttpServletRequest request) {
+        String contextPath = request.getContextPath();
+        return (contextPath.length() > 0) ? contextPath : "/";
     }
 }
