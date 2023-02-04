@@ -36,15 +36,15 @@ public class UserAuthenticationService {
         final UsernamePasswordAuthenticationToken unauthenticatedUser = UsernamePasswordAuthenticationToken
                 .unauthenticated(requestDTO.getEmail(), requestDTO.getPassword());
         final Authentication authentication = jwtAuthenticationManager.authenticate(unauthenticatedUser);
-        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         if (requestDTO.isRememberMe()) {
             customTokenBasedRememberMeCookieService.onLoginSuccess(request, response, authentication);
         } else {
             customTokenBasedRememberMeCookieService.cancel(response);
         }
 
-        String accessToken = jwtService.generateAccessToken(userDetails);
-        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        final String accessToken = jwtService.generateAccessToken(userDetails);
+        final String refreshToken = jwtService.generateRefreshToken(userDetails);
         userCacheService.saveJwtSession(userDetails.getUsername(), accessToken, refreshToken);
         return LoginResponseDTO.builder()
                 .accessToken(accessToken)
