@@ -8,6 +8,7 @@ import com.diego.securityflows.entity.User;
 import com.diego.securityflows.util.StringUtils;
 import com.diego.securityflows.validation.BeanValidator;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
+    @Cacheable(value = "users", key = "#username")
     public UserDTO find(String username) {
         final User user = inMemoryUserDetailsService.getUser(username);
         return UserDTO.builder()

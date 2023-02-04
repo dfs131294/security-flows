@@ -10,13 +10,16 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class UserDTO {
+public class UserDTO implements Serializable {
+
+    private static final long serialVersionUID = 7156526077883281623L;
 
     @NotEmpty(message = "Email should not be empty")
     @Email(message = "Email must have a valid format")

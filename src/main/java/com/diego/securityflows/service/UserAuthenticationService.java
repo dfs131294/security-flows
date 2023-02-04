@@ -10,11 +10,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,22 +21,22 @@ import javax.servlet.http.HttpServletResponse;
 public class UserAuthenticationService {
 
     private static final String REFRESH_TOKEN_HEADER = "X-Auth-Refresh-Token";
-    private static final String REMEMBER_ME_COOKIE = "remember-me";
     private final AuthenticationManager jwtAuthenticationManager;
     private final InMemoryUserDetailsService inMemoryUserDetailsService;
     private final JwtService jwtService;
     private final BeanValidator beanValidator;
-    private final TokenBasedRememberMeServices tokenBasedRememberMeServices;
-    private final CookieService cookieService;
+    private final CustomTokenBasedRememberMeCookieService customTokenBasedRememberMeCookieService;
 
     public LoginResponseDTO login(LoginRequestDTO requestDTO, HttpServletRequest request, HttpServletResponse response) {
         beanValidator.validate(requestDTO);
-        final UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken
+        final UsernamePasswordAuthenticationToken unauthenticatedUser = UsernamePasswordAuthenticationToken
                 .unauthenticated(requestDTO.getEmail(), requestDTO.getPassword());
-        final Authentication authentication = jwtAuthenticationManager.authenticate(token);
+        final Authentication authentication = jwtAuthenticationManager.authenticate(unauthenticatedUser);
         final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         if (requestDTO.isRememberMe()) {
-            tokenBasedRememberMeServices.onLoginSuccess(request, response, authentication);
+            customTokenBasedRememberMeCookieService.onLoginSuccess(request, response, authentication);
+        } else {
+            customTokenBasedRememberMeCookieService.cancel(response);
         }
 
         return LoginResponseDTO.builder()
@@ -47,11 +45,8 @@ public class UserAuthenticationService {
                 .build();
     }
 
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        Cookie cookie = new Cookie(REMEMBER_ME_COOKIE, null);
-        cookie.setPath(this.getCookiePath(request));
-        cookie.setSecure(false);
-        cookieService.cancel(cookie, response);
+    public void logout(HttpServletResponse response) {
+        customTokenBasedRememberMeCookieService.cancel(response);
     }
 
     public LoginResponseDTO refreshToken(HttpServletRequest request) {
@@ -72,10 +67,5 @@ public class UserAuthenticationService {
         }
 
         return refreshTokenHeader.substring(7);
-    }
-
-    private String getCookiePath(HttpServletRequest request) {
-        String contextPath = request.getContextPath();
-        return (contextPath.length() > 0) ? contextPath : "/";
     }
 }

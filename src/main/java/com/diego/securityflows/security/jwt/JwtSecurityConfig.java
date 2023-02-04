@@ -1,7 +1,5 @@
 package com.diego.securityflows.security.jwt;
 
-import com.diego.securityflows.exception.GlobalAuthenticationEntryPoint;
-import com.diego.securityflows.service.InMemoryUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,23 +13,27 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class JwtSecurityConfig {
 
-
     private static final String REMEMBER_ME_KEY = "*F-JaNcRfUjXn2r5u8x/A?D(G+KbPeSg";
-    private final InMemoryUserDetailsService inMemoryUserDetailsService;
+    private final UserDetailsService inMemoryUserDetailsService;
+    private final RememberMeServices customTokenBasedRememberMeCookieService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final GlobalAuthenticationEntryPoint globalAuthenticationEntryPoint;
+    private final PasswordEncoder bCryptPasswordEncoder;
+    private final AccessDeniedHandler customAccessDeniedHandlerImpl;
+    private final AuthenticationEntryPoint globalAuthenticationEntryPoint;
 
     @Bean
     public RoleHierarchy roleHierarchy() {
@@ -39,11 +41,6 @@ public class JwtSecurityConfig {
         final String hierarchy = "ROLE_ADMIN > ROLE_OPERATOR > ROLE_USER > ROLE_GUEST";
         roleHierarchy.setHierarchy(hierarchy);
         return roleHierarchy;
-    }
-
-    @Bean
-    public TokenBasedRememberMeServices tokenBasedRememberMeServices() {
-        return new TokenBasedRememberMeServices(REMEMBER_ME_KEY, inMemoryUserDetailsService);
     }
 
     @Bean
@@ -75,16 +72,17 @@ public class JwtSecurityConfig {
                 .anyRequest().authenticated()
                 .and()
                 .rememberMe()
-                .rememberMeServices(tokenBasedRememberMeServices())
+                .rememberMeServices(customTokenBasedRememberMeCookieService)
                 .and()
                 .authenticationManager(jwtAuthenticationManager())
                 .exceptionHandling()
+                .accessDeniedHandler(customAccessDeniedHandlerImpl)
                 .authenticationEntryPoint(globalAuthenticationEntryPoint)
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterAfter(jwtAuthenticationFilter, RememberMeAuthenticationFilter.class);
 
         return http.build();
     }

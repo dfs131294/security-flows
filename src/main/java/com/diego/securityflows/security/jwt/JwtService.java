@@ -1,12 +1,16 @@
 package com.diego.securityflows.security.jwt;
 
 import com.diego.securityflows.common.Constants;
+import com.diego.securityflows.domain.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -19,8 +23,8 @@ public class JwtService {
 
     private static final String ISSUER = "security-flows";
     private static final String ROLES_CLAIM = "roles";
-    private static final int ACCESS_TOKEN_EXPIRE_MS = 120 * 1000;
-    private static final int REFRESH_TOKEN_EXPIRE_MS = 140 * 1000;
+    private static final int ACCESS_TOKEN_EXPIRE_MS = 3600 * 1000;
+    private static final int REFRESH_TOKEN_EXPIRE_MS = 3800 * 1000;
     private static final byte[] ACCESS_TOKEN_SECRET_BYTES = Base64.getEncoder().encode("u8x/A?D(G-KaPdSgVkYp3s6v9y$B&E)H".getBytes());
     private static final byte[] REFRESH_TOKEN_SECRET_BYTES = Base64.getEncoder().encode("s6v9y$B&E)H@McQfTjWnZq4t7w!z%C*F".getBytes());
     private static final Key ACCESS_TOKEN_KEY = Keys.hmacShaKeyFor(ACCESS_TOKEN_SECRET_BYTES);
@@ -49,6 +53,19 @@ public class JwtService {
 
     public String getUsernameFromAccessToken(String token) {
         return getClaims(token, ACCESS_TOKEN_KEY).getSubject();
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    public UsernamePasswordAuthenticationToken parseAuthToken(String token) {
+        final Claims claims = getClaims(token, ACCESS_TOKEN_KEY);
+        final String username = claims.getSubject();
+        final List<String> roles = (List<String>) claims.get(ROLES_CLAIM);
+        final List<SimpleGrantedAuthority> authorities = Role.fromString(roles).stream()
+                .map(r -> String.format("%s%s", Constants.ROLE_STARTER, r))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+        return UsernamePasswordAuthenticationToken.authenticated(username,
+                null, authorities);
     }
 
     public String getUsernameFromRefreshToken(String token) {

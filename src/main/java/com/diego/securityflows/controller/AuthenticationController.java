@@ -30,8 +30,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        userAuthenticationService.logout(request, response);
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        userAuthenticationService.logout(response);
         return ResponseEntity.ok().build();
     }
 

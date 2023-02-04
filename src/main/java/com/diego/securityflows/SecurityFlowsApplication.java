@@ -3,12 +3,15 @@ package com.diego.securityflows;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
-public class SecurityFlowsApplication {
+@EnableCaching
+public class SecurityFlowsApplication
+{
 	private static ConfigurableApplicationContext context;
 
 	public static void main(String[] args) {
