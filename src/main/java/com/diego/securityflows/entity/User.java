@@ -2,6 +2,7 @@ package com.diego.securityflows.entity;
 
 import com.diego.securityflows.common.Constants;
 import com.diego.securityflows.domain.Role;
+import com.diego.securityflows.domain.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,6 +39,8 @@ public class User implements UserDetails {
     private String password;
 
     private List<Role> roles;
+
+    private UserStatus status;
 
     public User(String email, String password) {
         this.email = email;
@@ -85,7 +88,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.status.equals(UserStatus.ACTIVE);
     }
 
     public static List<Role> getDefaultRole() {

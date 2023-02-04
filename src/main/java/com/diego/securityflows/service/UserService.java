@@ -17,4 +17,6 @@ public interface UserService {
     void update(String username, UpdateUserRequestDTO userDTO);
 
     void delete(String username);
+
+    void disable(String username);
 }

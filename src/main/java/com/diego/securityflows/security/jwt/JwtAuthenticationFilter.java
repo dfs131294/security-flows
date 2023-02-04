@@ -1,13 +1,16 @@
 package com.diego.securityflows.security.jwt;
 
+import com.diego.securityflows.service.UserCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
@@ -17,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_TOKEN_STARTER = "Bearer ";
     private final JwtService jwtService;
     private final HandlerExceptionResolver handlerExceptionResolver;
+    private final UserCacheService userCacheService;
 
     @Override
     protected void doFilterInternal(
@@ -46,6 +51,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String jwt = this.parseToken(authHeader);
             jwtService.validateAccessToken(jwt);
             final UsernamePasswordAuthenticationToken authToken = jwtService.parseAuthToken(jwt);
+            final String username = (String) authToken.getPrincipal();
+            final String jwtSession = userCacheService.get(username);
+            if (!StringUtils.hasText(jwtSession)) {
+                throw new AccessDeniedException("");
+            }
             SecurityContextHolder.createEmptyContext();
             SecurityContextHolder.getContext().setAuthentication(authToken);
             filterChain.doFilter(request, response);

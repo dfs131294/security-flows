@@ -1,6 +1,7 @@
 package com.diego.securityflows.dto;
 
 import com.diego.securityflows.domain.Role;
+import com.diego.securityflows.domain.UserStatus;
 import com.diego.securityflows.validation.UniqueValues;
 import com.diego.securityflows.validation.ValueOfEnum;
 import lombok.AllArgsConstructor;
@@ -27,4 +28,6 @@ public class UpdateUserRequestDTO {
     @UniqueValues(message = "Role should be unique")
     @ValueOfEnum(enumClass = Role.class, message = "Role should be USER or ADMIN")
     private List<String> roles;
+
+    private UserStatus status;
 }

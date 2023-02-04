@@ -1,7 +1,10 @@
 package com.diego.securityflows.service;
 
+import com.diego.securityflows.domain.UserStatus;
 import com.diego.securityflows.dto.LoginRequestDTO;
 import com.diego.securityflows.dto.LoginResponseDTO;
+import com.diego.securityflows.dto.UpdateUserRequestDTO;
+import com.diego.securityflows.entity.User;
 import com.diego.securityflows.security.jwt.JwtService;
 import com.diego.securityflows.validation.BeanValidator;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ public class UserAuthenticationService {
     private final JwtService jwtService;
     private final BeanValidator beanValidator;
     private final CustomTokenBasedRememberMeCookieService customTokenBasedRememberMeCookieService;
+    private final UserCacheService userCacheService;
 
     public LoginResponseDTO login(LoginRequestDTO requestDTO, HttpServletRequest request, HttpServletResponse response) {
         beanValidator.validate(requestDTO);
@@ -39,9 +43,12 @@ public class UserAuthenticationService {
             customTokenBasedRememberMeCookieService.cancel(response);
         }
 
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        userCacheService.saveJwtSession(userDetails.getUsername(), accessToken, refreshToken);
         return LoginResponseDTO.builder()
-                .accessToken(jwtService.generateAccessToken(userDetails))
-                .refreshToken(jwtService.generateRefreshToken(userDetails))
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 

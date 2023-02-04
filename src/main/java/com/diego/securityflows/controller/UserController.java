@@ -53,4 +53,10 @@ public class UserController {
         inMemoryUserService.delete(request.getEmail());
         return ResponseEntity.ok("User deleted successfully");
     }
+
+    @PutMapping("{username}/disable")
+    public ResponseEntity<Void> disable(@PathVariable String username) {
+        inMemoryUserService.disable(username);
+        return ResponseEntity.ok().build();
+    }
 }

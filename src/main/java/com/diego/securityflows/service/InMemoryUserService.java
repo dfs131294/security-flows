@@ -1,6 +1,7 @@
 package com.diego.securityflows.service;
 
 import com.diego.securityflows.domain.Role;
+import com.diego.securityflows.domain.UserStatus;
 import com.diego.securityflows.dto.CreateUserRequestDTO;
 import com.diego.securityflows.dto.UpdateUserRequestDTO;
 import com.diego.securityflows.dto.UserDTO;
@@ -23,6 +24,7 @@ public class InMemoryUserService implements UserService {
     private final BeanValidator beanValidator;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final InMemoryUserDetailsService inMemoryUserDetailsService;
+    private final UserCacheService userCacheService;
 
     @Override
     public List<UserDTO> findAll() {
@@ -78,6 +80,15 @@ public class InMemoryUserService implements UserService {
         inMemoryUserDetailsService.deleteUser(user.getUsername());
     }
 
+    @Override
+    public void disable(String username) {
+        UpdateUserRequestDTO userRequestDTO = UpdateUserRequestDTO.builder()
+                .status(UserStatus.INACTIVE)
+                .build();
+        update(username, userRequestDTO);
+        userCacheService.removeJwtSession(username);
+    }
+
     private User buildUser(CreateUserRequestDTO userDTO, String encodedPassword) {
         return User.builder()
                 .email(userDTO.getEmail().toLowerCase())
@@ -85,6 +96,7 @@ public class InMemoryUserService implements UserService {
                 .lastname(userDTO.getLastname())
                 .password(encodedPassword)
                 .roles(Role.fromString(userDTO.getRoles()))
+                .status(UserStatus.ACTIVE)
                 .build();
     }
 
@@ -98,6 +110,7 @@ public class InMemoryUserService implements UserService {
                 .firstname(StringUtils.getNonEmptyValue(userDTO.getFirstname(), user.getFirstname()))
                 .lastname(StringUtils.getNonEmptyValue(userDTO.getLastname(), user.getLastname()))
                 .roles(Role.fromString(roles))
+                .status(userDTO.getStatus())
                 .build();
     }
 }
