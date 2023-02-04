@@ -17,7 +17,7 @@ public class UserCacheService {
 
     private final CacheManager cacheManager;
 
-    public String get(String username) {
+    public String getJwtSession(String username) {
         Cache cache = cacheManager.getCache("jwt-session");
         if (Objects.nonNull(cache.get(username)) && Objects.nonNull(cache.get(username).get())) {
             return (String) cache.get(username).get();

@@ -48,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             jwtService.validateAccessToken(jwt);
             final UsernamePasswordAuthenticationToken authToken = jwtService.parseAuthToken(jwt);
             final String username = (String) authToken.getPrincipal();
-            final String jwtSession = userCacheService.get(username);
+            final String jwtSession = userCacheService.getJwtSession(username);
             if (!StringUtils.hasText(jwtSession)) {
                 throw new AccessDeniedException("");
             }
